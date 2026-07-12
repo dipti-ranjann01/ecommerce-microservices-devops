@@ -65,7 +65,7 @@ Cloud
 
 Project Structure
 
-project/
+ecommerce-project/
 ├── services/
 │   ├── auth-service
 │   ├── product-service
