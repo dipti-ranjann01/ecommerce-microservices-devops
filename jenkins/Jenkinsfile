@@ -1,0 +1,90 @@
+pipeline {
+    agent any
+
+    
+    stages {
+        stage('Prepare Workspace'){
+            steps{
+                sh '''
+                rm -rf $WORKSPACE/project
+                cp -r /workspace/ecommerce $WORKSPACE/project
+                '''
+            }
+        }
+
+        stage('Verify Workspace'){
+            steps{
+                dir("${WORKSPACE}/project"){
+                    sh 'pwd'
+                    sh 'ls -la'
+                }
+            }
+        } 
+        stage('Install Dependencies'){
+            steps {
+                dir("${WORKSPACE}/project"){
+                    sh '''
+                    for service in auth-service product-service inventory-service order-service notification-service
+                    do
+                        echo "Installing $service"
+                        cd "services/${service}"
+                        npm install -y
+                        cd ../..
+                    done
+                    echo "Installing shared npm"
+                    npm install -y
+                    '''
+                }
+            }
+        }
+        stage('Build docker images'){
+            steps{
+                dir("${WORKSPACE}/project"){
+                    sh './scripts/build-images.sh'
+                }
+            }
+        }
+        stage('Helm Lint') {
+            steps {
+                dir("${WORKSPACE}/project"){
+                    sh "helm lint ./helm/ecommerce-project"
+                }
+            }
+        }
+        stage('Helm Template') {
+            steps {
+                dir("${WORKSPACE}/project"){
+                    sh "helm template ecommerce-project ./helm/ecommerce-project"
+                }
+            }
+        }
+        stage('Helm Deploy') {
+            steps{
+                dir("${WORKSPACE}/project"){
+                    sh '''
+                    helm upgrade --install ecommerce-project ./helm/ecommerce-project \
+                    --namespace ecommerce \
+                    --create-namespace
+                    '''
+                }
+            }
+        }
+        stage('Verify Deployment'){
+            steps{
+                dir("${WORKSPACE}/project"){
+                    sh '''
+                    kubectl get pods -n ecommerce-dev
+                    kubectl get svc -n ecommerce-dev
+                    '''
+                }
+            }
+        }
+        stage('Smoke Test'){
+            steps {
+                sh '''
+                curl -f http://localhost:8080/products || exit 1
+                '''
+            }
+        }
+    }
+}

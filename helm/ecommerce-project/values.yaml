@@ -1,0 +1,57 @@
+namespace: ecommerce-dev
+
+imagePullPolicy: IfNotPresent
+
+postgres:
+  image: postgres:17
+  user: ""
+  password: ""
+  database: ecommerce
+  storage: 5Gi
+  pvcname: postgres-pvc-dev
+
+redis:
+  image: redis:7-alpine
+
+kafka:
+  image: apache/kafka:3.9.1
+
+auth:
+  image: diptidocker99/auth-service:1.0
+  replicaCount: 2
+  port: 3005
+  jwtsecret: ""
+
+product:
+  image: diptidocker99/product-service:1.1
+  replicaCount: 2
+  port: 3001
+
+order:
+  image: diptidocker99/order-service:1.0
+  replicaCount: 2
+  port: 3002
+
+inventory:
+  image: diptidocker99/inventory-service:1.0
+  replicaCount: 2
+  port: 3003
+
+notification:
+  image: diptidocker99/notification-service:1.0
+  replicaCount: 2
+  port: 3004
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+hpa:
+    minReplicas: 2
+    maxReplicas: 5
+    cpuUtlization: 70

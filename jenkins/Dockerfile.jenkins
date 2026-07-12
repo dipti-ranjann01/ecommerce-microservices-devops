@@ -1,0 +1,24 @@
+FROM jenkins/jenkins:lts
+
+USER root
+
+#Install docker and nodejs 
+RUN apt-get update && \
+    apt-get install -y docker.io  curl && \
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y nodejs
+
+#Add user    
+RUN groupadd -g 989 dockerhost || true && \
+    usermod -aG dockerhost jenkins
+
+#Install Helm
+RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+#Install Kubernetes
+RUN KUBECTL_VERSION=$(curl -L -s "https://dl.k8s.io/release/stable.txt") && \
+    curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
+    chmod +x kubectl && \
+    mv kubectl /usr/local/bin/kubectl
+
+USER jenkins

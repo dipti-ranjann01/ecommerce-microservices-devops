@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: product-service
+  namespace: {{ .Values.namespace }}
+
+spec:
+  replicas: {{ .Values.product.replicaCount }}
+
+  selector:
+    matchLabels:
+      app: product-service
+  
+  template:
+    metadata:
+      labels:
+        app: product-service
+    
+    spec:
+      containers:
+        - name: product-service
+          image: {{ .Values.product.image }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.product.port }}
+          envFrom:
+            - configMapRef:
+                name: ecommerce-config
+            - secretRef:
+                name: ecommerce-secret
+          
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+            
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.product.port }}
+
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.product.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 5  
