@@ -14,6 +14,13 @@ The application is built using the following microservices:
 * Order Service
 * Notification Service
 
+
+<img width="500" height="193" alt="image" src="https://github.com/user-attachments/assets/459c9e67-4c02-4103-a3f3-58254624993c" />
+
+
+_____
+
+
 Supporting infrastructure:
 
 * PostgreSQL
@@ -23,6 +30,7 @@ Supporting infrastructure:
 * Horizontal Pod Autoscaler (HPA)
 
 ⸻
+
 
 Tech Stack
 
@@ -65,30 +73,46 @@ Cloud
 
 Project Structure
 
-ecommerce-project/
-├── services/
-│   ├── auth-service
-│   ├── product-service
-│   ├── inventory-service
-│   ├── order-service
-│   └── notification-service
-│
-├── shared/
-│
-├── helm/
-│   └── ecommerce-project/
-│
-├── k8s/
-│
-├── scripts/
-│
-├── jenkins/
-│   ├── Dockerfile.jenkins
-│   └── Jenkinsfile
-│
-├── docker-compose.yml
-│
-└── README.md
+* ecommerce-project/
+  * services/
+    * auth-service
+    * product-service
+    * inventory-service
+    * order-service
+    * notification-service
+  * shared/
+  * helm/
+    * ecommerce-project/
+  * k8s/
+    * namespace
+    * ingress
+    * secret
+    * configmap
+    * postgres
+    * kafka
+    * redis
+    * product-service
+    * order-service
+    * inventory-service
+    * notification-service
+    * auth-service
+  * scripts/
+    * build-images.sh
+  * jenkins/
+    * Jenkinsfile
+    * Dockerfile.jenkins
+  * terraform/
+    * modules/
+      * alb
+      * eks
+      * kafka
+      * monitoring
+      * rds
+      * redis
+      * security-groups
+      * vpc
+  * docker-compose.yml
+  * README.md
 
 ⸻
 
